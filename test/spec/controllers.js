@@ -1,19 +1,19 @@
 'use strict';
 
-describe('Controller: PetIndexCtrl', function () {
+describe('Controller: LoginCtrl', function () {
 
   var should = chai.should();
 
   // load the controller's module
   beforeEach(module('EmbassyNetwork'));
 
-  var PetIndexCtrl,
+  var LoginCtrl,
     scope;
 
   // Initialize the controller and a mock scope
   beforeEach(inject(function ($controller, $rootScope) {
     scope = $rootScope.$new();
-    PetIndexCtrl = $controller('PetIndexCtrl', {
+    LoginCtrl = $controller('LoginCtrl', {
       $scope: scope
     });
   }));
