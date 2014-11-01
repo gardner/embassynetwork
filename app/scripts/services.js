@@ -9,6 +9,7 @@ angular.module('EmbassyNetwork.services', [])
  
   authService.login = function (credentials) {
     console.log('credentials:', credentials);
+    localStorage.setItem('credentials', credentials);
     return $http
       .post('/login', credentials)
       .then(function (res) {
@@ -54,7 +55,18 @@ angular.module('EmbassyNetwork.services', [])
 
 .factory('AuthInterceptor', function ($rootScope, $q, AUTH_EVENTS) {
   return {
+    request: function (config) {
+
+      // use this to destroying other existing headers
+      config.headers = {'Authentication':'authentication'}
+
+      // use this to prevent destroying other existing headers
+      // config.headers['Authorization'] = 'authentication;
+
+      return config;
+    },    
     responseError: function (response) {
+      console.log('response.status:', response.status);
       $rootScope.$broadcast({
         401: AUTH_EVENTS.notAuthenticated,
         403: AUTH_EVENTS.notAuthorized,
@@ -89,4 +101,22 @@ angular.module('EmbassyNetwork.services', [])
       return messages[messageId];
     }
   };
+})
+.factory('LocationsService', function ($http, Session) {
+  var LocationsService = {};
+ 
+  LocationsService.login = function (credentials) {
+    console.log('credentials:', credentials);
+    localStorage.setItem('credentials', credentials);
+    return $http
+      .post('/login', credentials)
+      .then(function (res) {
+        console.log(res);
+        Session.create(res.data.id, res.data.user.id,
+                       res.data.user.role);
+        return res.data.user;
+      });
+  };
+ 
+  return LocationsService;
 });
