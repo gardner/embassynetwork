@@ -1,24 +1,37 @@
-brew update && brew install ant phantomjs node android-sdk
+#Overview
+A mobile client to the [modernomad](https://github.com/jessykate/modernomad) server software. The mobile client is written in [AngularJS](https://angularjs.org/) using the [Ionic](http://ionicframework.com/) framework and compiled with Apache [Cordova](http://cordova.apache.org/). The initial code was generated using the [ionic generator](https://github.com/diegonetto/generator-ionic) for [yeoman](http://yeoman.io/).
 
-echo "ANDROID_HOME=/usr/local/opt/android-sdk" >> ~/.bash_profile
+## Develop
+    brew update && brew install node git
+    git clone git@github.com:gardner/embassynetwork.git
+    cd embassynetwork
+    npm update -g npm
+    npm install -g bower
+    npm install && bower install
+    grunt serve
 
-android update sdk -u --all --filter platform-tool,android-19,build-tools-19.1.0
+## Build for Devices
+The build system is based around cordova. The code can be built for multiple platforms. An osx machine with Xcode installed is required to build for iOS.
 
-adb kill-server ; adb start-server
+### iOS
+    brew update && brew install node git
+    npm install -g bower
+    npm install -g cordova
+    npm update -g npm
+    npm install -g ios-sim
+    grunt platform:add:ios
+    npm install && bower install    
+    grunt emulate:ios
+    
 
-npm update -g npm
-npm install -g bower
-npm install -g cordova
-
-npm install && bower install
-
-if which xcodebuild >/dev/null; then
-  grunt platform:add:ios
-fi
-
-if which android >/dev/null; then
-  grunt platform:add:android
-fi
-
-grunt run:ios
-grunt run:android
+### Android
+    brew update && brew install ant phantomjs node android-sdk node git
+    npm update -g npm
+    npm install -g bower
+    npm install -g cordova
+    echo "ANDROID_HOME=/usr/local/opt/android-sdk" >> ~/.bash_profile
+    android update sdk -u --all --filter platform-tool,android-19,build-tools-19.1.0
+    adb kill-server ; adb start-server
+    npm install && bower install
+    grunt platform:add:android
+    grunt run:android
