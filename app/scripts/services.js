@@ -8,9 +8,11 @@ angular.module('EmbassyNetwork.services', [])
   var authService = {};
  
   authService.login = function (credentials) {
+    console.log('credentials:', credentials);
     return $http
       .post('/login', credentials)
       .then(function (res) {
+        console.log(res);
         Session.create(res.data.id, res.data.user.id,
                        res.data.user.role);
         return res.data.user;
@@ -18,15 +20,19 @@ angular.module('EmbassyNetwork.services', [])
   };
  
   authService.isAuthenticated = function () {
+    console.log('auth', Session.userId);
     return !!Session.userId;
   };
  
   authService.isAuthorized = function (authorizedRoles) {
+    console.log('authorizedRoles:', authorizedRoles);
     if (!angular.isArray(authorizedRoles)) {
       authorizedRoles = [authorizedRoles];
     }
-    return (authService.isAuthenticated() &&
-      authorizedRoles.indexOf(Session.userRole) !== -1);
+    var rc = ((authService.isAuthenticated() &&
+      authorizedRoles.indexOf(Session.userRole) !== -1));
+    console.log('isAuthorized =', rc);
+    return rc;
   };
  
   return authService;
@@ -46,8 +52,7 @@ angular.module('EmbassyNetwork.services', [])
   return this;
 })
 
-.factory('AuthInterceptor', function ($rootScope, $q,
-                                      AUTH_EVENTS) {
+.factory('AuthInterceptor', function ($rootScope, $q, AUTH_EVENTS) {
   return {
     responseError: function (response) {
       $rootScope.$broadcast({

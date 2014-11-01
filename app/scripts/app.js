@@ -6,7 +6,13 @@
 // the 2nd parameter is an array of 'requires'
 // 'starter.services' is found in services.js
 // 'starter.controllers' is found in controllers.js
-angular.module('EmbassyNetwork', ['ionic', 'config', 'EmbassyNetwork.controllers', 'EmbassyNetwork.services'])
+angular.module('EmbassyNetwork', [
+  'ionic',
+  'config',
+  'EmbassyNetwork.controllers',
+  'EmbassyNetwork.services',
+  'restangular'
+])
 
 .constant('AUTH_EVENTS', {
   loginSuccess: 'auth-login-success',
@@ -20,53 +26,14 @@ angular.module('EmbassyNetwork', ['ionic', 'config', 'EmbassyNetwork.controllers
 .constant('USER_ROLES', {
   all: '*',
   admin: 'admin',
-  editor: 'editor',
+  user: 'user',
   guest: 'guest'
-})
-
-.run(function($ionicPlatform) {
-  $ionicPlatform.ready(function() {
-    // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
-    // for form inputs)
-    if(window.cordova && window.cordova.plugins.Keyboard) {
-      cordova.plugins.Keyboard.hideKeyboardAccessoryBar(true);
-    }
-    if(window.StatusBar) {
-      // org.apache.cordova.statusbar required
-      StatusBar.styleDefault();
-    }
-  });
-})
-
-.run(function ($rootScope, AUTH_EVENTS, AuthService) {
-  $rootScope.$on('$stateChangeStart', function (event, next) {
-    var authorizedRoles = next.data.authorizedRoles;
-    if (!AuthService.isAuthorized(authorizedRoles)) {
-      event.preventDefault();
-      if (AuthService.isAuthenticated()) {
-        // user is not allowed
-        $rootScope.$broadcast(AUTH_EVENTS.notAuthorized);
-      } else {
-        // user is not logged in
-        $rootScope.$broadcast(AUTH_EVENTS.notAuthenticated);
-      }
-    }
-  });
-})
-
-.config(function ($httpProvider) {
-  $httpProvider.interceptors.push([
-    '$injector',
-    function ($injector) {
-      return $injector.get('AuthInterceptor');
-    }
-  ]);
 })
 
 .directive('loginDialog', function (AUTH_EVENTS) {
   return {
     restrict: 'A',
-    template: '<div ng-if="visible" ng-include="\'login-form.html\'">',
+    template: '<div ng-if="visible" ng-include="\'templates/login.html\'">',
     link: function (scope) {
       var showDialog = function () {
         scope.visible = true;
@@ -78,23 +45,56 @@ angular.module('EmbassyNetwork', ['ionic', 'config', 'EmbassyNetwork.controllers
   };
 })
 
-.config(function($stateProvider, $urlRouterProvider) {
+.run(function($ionicPlatform, $rootScope, AUTH_EVENTS, AuthService) {
+  $ionicPlatform.ready(function() {
+    // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
+    // for form inputs)
+    if(window.cordova && window.cordova.plugins.Keyboard) {
+      cordova.plugins.Keyboard.hideKeyboardAccessoryBar(true);
+    }
+    if(window.StatusBar) {
+      // org.apache.cordova.statusbar required
+      StatusBar.styleDefault();
+    }
+    $rootScope.$on('$stateChangeStart', function (event, next) {
+      var authorizedRoles = next.data.authorizedRoles;
+      if (!AuthService.isAuthorized(authorizedRoles)) {
+        event.preventDefault();
+        if (AuthService.isAuthenticated()) {
+          // user is not allowed
+          $rootScope.$broadcast(AUTH_EVENTS.notAuthorized);
+        } else {
+          // user is not logged in
+          $rootScope.$broadcast(AUTH_EVENTS.notAuthenticated);
+        }
+      }
+    });
+  });
+})
 
+.config(function($stateProvider, $urlRouterProvider, $httpProvider, USER_ROLES, RestangularProvider, ENV) {
+  RestangularProvider.setBaseUrl(ENV.apiEndpoint + '/api/v1');
   // Ionic uses AngularUI Router which uses the concept of states
   // Learn more here: https://github.com/angular-ui/ui-router
   // Set up the various states which the app can be in.
   // Each state's controller can be found in controllers.js
   $stateProvider
-
+    .state('login', {
+      url: '/login',
+      templateUrl: 'templates/login.html',
+      controller: 'SignInCtrl'
+    })
     // setup an abstract state for the tabs directive
     .state('tab', {
       url: '/tab',
       abstract: true,
-      templateUrl: 'templates/tabs.html'
+      templateUrl: 'templates/tabs.html',
+      data: {
+        authorizedRoles: [USER_ROLES.user, USER_ROLES.admin]
+      }
     })
-
+    
     // Each tab has its own nav history stack:
-
     .state('tab.today', {
       url: '/today',
       views: {
@@ -136,6 +136,13 @@ angular.module('EmbassyNetwork', ['ionic', 'config', 'EmbassyNetwork.controllers
 
   // if none of the above states are matched, use this as the fallback
   $urlRouterProvider.otherwise('/tab/today');
+
+  $httpProvider.interceptors.push([
+    '$injector',
+    function ($injector) {
+      return $injector.get('AuthInterceptor');
+    }
+  ]);
 
 });
 

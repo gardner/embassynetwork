@@ -41,7 +41,7 @@ module.exports = function (grunt) {
         constants: {
           ENV: {
             name: 'development',
-            apiEndpoint: 'http://dev.yoursite.com:10000/'
+            apiEndpoint: 'http://localhost:8989/api/v1'
           }
         }
       },
@@ -49,7 +49,7 @@ module.exports = function (grunt) {
         constants: {
           ENV: {
             name: 'production',
-            apiEndpoint: 'http://api.yoursite.com/'
+            apiEndpoint: 'https://embassynetwork.com/api/v1'
           }
         }
       }

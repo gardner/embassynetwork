@@ -5,10 +5,19 @@ angular.module('EmbassyNetwork.controllers', [])
   $scope.currentUser = null;
   $scope.userRoles = USER_ROLES;
   $scope.isAuthorized = AuthService.isAuthorized;
+  $scope.isLoginPage = false;
+  $scope.getOpacity = function() {
+    if (!$scope.isAuthorized) {
+      return 0.7;
+    } else {
+      return 1;
+    }
+  }
  
   $scope.setCurrentUser = function (user) {
     $scope.currentUser = user;
   };
+  
 })
 
 .controller('LoginCtrl', function ($scope, $rootScope, AUTH_EVENTS, AuthService) {
@@ -16,7 +25,9 @@ angular.module('EmbassyNetwork.controllers', [])
     username: '',
     password: ''
   };
+//  $scope.isLoginPage = true;
   $scope.login = function (credentials) {
+    console.log(credentials);
     AuthService.login(credentials).then(function (user) {
       $rootScope.$broadcast(AUTH_EVENTS.loginSuccess);
       $scope.setCurrentUser(user);
@@ -27,7 +38,7 @@ angular.module('EmbassyNetwork.controllers', [])
 })
 
 .controller('TodayCtrl', function($scope) {
-  console.log($scope);
+  console.log('TodayCtrl');
 })
 
 .controller('MessagesCtrl', function($scope, Messages) {
@@ -39,5 +50,5 @@ angular.module('EmbassyNetwork.controllers', [])
 })
 
 .controller('AccountCtrl', function($scope) {
-  console.log($scope);
+  console.log('AccountCtrl');
 });
