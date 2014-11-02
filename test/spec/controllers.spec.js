@@ -2,8 +2,6 @@
 
 describe('Controller: LoginCtrl', function () {
 
-  var should = chai.should();
-
   // load the controller's module
   beforeEach(module('EmbassyNetwork'));
 

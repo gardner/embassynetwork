@@ -1,7 +1,6 @@
 'use strict';
 
 describe('Service: AuthService', function () {
-  var should = chai.should();
   var AuthService,
     httpBackend;
 
@@ -14,35 +13,26 @@ describe('Service: AuthService', function () {
   }));
 });
 
-describe('Service: LocationsService', function () {
-  var should = chai.should();
-  var LocationsService,
+describe('Service: Locations', function () {
+  var Locations,
     httpBackend;
 
   // load the controller's module
   beforeEach(module('EmbassyNetwork'));
 
-  beforeEach(inject(function (_LocationsService_, $httpBackend, ENV) {
-    jasmine.getJSONFixtures().fixturesPath='test/fixtures';
-    LocationsService = _LocationsService_;
+  beforeEach(inject(function (_Locations_, $httpBackend, ENV) {
+    jasmine.getJSONFixtures().fixturesPath = 'base/test/fixtures';
+    Locations = _Locations_;
+    
     httpBackend = $httpBackend;
   }));
 
   it('should get a list of locations', function () {
-    console.log('thing');
-    console.log('thing');
-    console.log('thing');
-    console.log('thing');
-    console.log('thing');
-    console.log('thing');
-    console.log('thing');
-    console.log('thing');
-    console.log('thing');
-    console.log('thing');
+    console.log('Locations.getList()');
     httpBackend.whenGET('/locations').respond(
         getJSONFixture('locations.json')
     );
-//    LocationsService.
+    console.log(Locations.getList());
   });
 
 });
