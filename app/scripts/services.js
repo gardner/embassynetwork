@@ -102,21 +102,7 @@ angular.module('EmbassyNetwork.services', [])
     }
   };
 })
-.factory('LocationsService', function ($http, Session) {
-  var LocationsService = {};
- 
-  LocationsService.login = function (credentials) {
-    console.log('credentials:', credentials);
-    localStorage.setItem('credentials', credentials);
-    return $http
-      .post('/login', credentials)
-      .then(function (res) {
-        console.log(res);
-        Session.create(res.data.id, res.data.user.id,
-                       res.data.user.role);
-        return res.data.user;
-      });
-  };
- 
-  return LocationsService;
+
+.factory('Locations', function(Restangular) {
+  return Restangular.service('locations');
 });

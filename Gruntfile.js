@@ -320,7 +320,7 @@ module.exports = function (grunt) {
     karma: {
       options: {
         basePath: '',
-        frameworks: ['mocha', 'chai'],
+        frameworks: ['jasmine-jquery', 'jasmine'],
         files: [
           '<%= yeoman.app %>/lib/angular/angular.js',
           '<%= yeoman.app %>/lib/angular-animate/angular-animate.js',
@@ -332,9 +332,11 @@ module.exports = function (grunt) {
           '<%= yeoman.app %>/lib/lodash/dist/lodash.js',
           '<%= yeoman.app %>/lib/restangular/dist/restangular.js',
           '<%= yeoman.app %>/<%= yeoman.scripts %>/**/*.js',
+          {pattern: 'test/fixtures/*.json', served: true, included: false, watched: false},
           'test/mock/**/*.js',
           'test/spec/**/*.js'
         ],
+        logLevel: 'DEBUG',
         autoWatch: false,
         reporters: ['dots', 'coverage'],
         port: 8080,
@@ -437,7 +439,7 @@ module.exports = function (grunt) {
   // we don't have to run the karma test server as part of `grunt serve`
   grunt.registerTask('watch:karma', function () {
     var karma = {
-      files: ['<%= yeoman.app %>/<%= yeoman.scripts %>/**/*.js', 'test/spec/**/*.js'],
+      files: ['<%= yeoman.app %>/<%= yeoman.scripts %>/**/*.js', 'test/spec/**/*.js', 'test/fixtures/*.js'],
       tasks: ['newer:jshint:test', 'karma:unit:run']
     };
     grunt.config.set('watch', karma);

@@ -1,6 +1,9 @@
 #Overview
 A mobile client to the [modernomad](https://github.com/jessykate/modernomad) server software. The mobile client is written in [AngularJS](https://angularjs.org/) using the [Ionic](http://ionicframework.com/) framework and compiled with Apache [Cordova](http://cordova.apache.org/). The initial code was generated using the [ionic generator](https://github.com/diegonetto/generator-ionic) for [yeoman](http://yeoman.io/).
 
+## License
+The ambassynetwork code is licensed under the Affero General Public License, which is like the GPL but requires you provide access to the source code for any modified versions that are running publicly (among other things). The intent is to make sure that anyone improving the software makes those improvements available to others, as we have to them.
+
 ## Develop
     brew update && brew install node git
     git clone git@github.com:gardner/embassynetwork.git
