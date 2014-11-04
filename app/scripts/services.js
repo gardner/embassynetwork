@@ -1,56 +1,28 @@
 'use strict';
 angular.module('EmbassyNetwork.services', [])
 
-// kiped from:
-// https://medium.com/opinionated-angularjs/techniques-for-authentication-in-angularjs-applications-7bbf0346acec by gardner
-
-.factory('AuthService', function ($http, Session, ENV) {
+.factory('AuthService', function ($http, ENV) {
   var authService = {};
   var apiEndpoint = ENV.apiEndpoint;
+
+  
+  var storedCredentials = localStorage.getItem('credentials');
+  console.log('AuthService.credentials:', storedCredentials.username);
+  var storedAuth = btoa(storedCredentials.username + ':' + storedCredentials.password);
+  $http.defaults.headers.common.Authorization = 'Basic ' + storedAuth;
  
   authService.login = function (credentials) {
+    var storedCredentials = localStorage.getItem('credentials');
+    console.log('AuthService.credentials1:', storedCredentials.username);
     localStorage.setItem('credentials', credentials);
-    return $http
-      .post(apiEndpoint + '/auth/user/', credentials)
-      .then(function (res) {
-        console.log(res);
-        Session.create(res.data.id, res.data.user.id,
-                       res.data.user.role);
-        return res.data.user;
-      });
-  };
- 
-  authService.isAuthenticated = function () {
-    console.log('auth', Session.userId);
-    return !!Session.userId;
-  };
- 
-  authService.isAuthorized = function (authorizedRoles) {
-    console.log('authorizedRoles:', authorizedRoles);
-    if (!angular.isArray(authorizedRoles)) {
-      authorizedRoles = [authorizedRoles];
-    }
-    var rc = ((authService.isAuthenticated() &&
-      authorizedRoles.indexOf(Session.userRole) !== -1));
-    console.log('isAuthorized =', rc);
-    return rc;
+    var storedCredentials = localStorage.getItem('credentials');
+    console.log('AuthService.credentials2:', storedCredentials.username);
+    var auth = btoa(credentials.username + ':' + credentials.password);
+    $http.defaults.headers.common.Authorization = 'Basic ' + auth;
+    return $http.get(apiEndpoint + '/auth/user/');
   };
  
   return authService;
-})
-
-.service('Session', function () {
-  this.create = function (sessionId, userId, userRole) {
-    this.id = sessionId;
-    this.userId = userId;
-    this.userRole = userRole;
-  };
-  this.destroy = function () {
-    this.id = null;
-    this.userId = null;
-    this.userRole = null;
-  };
-  return this;
 })
 
 .factory('AuthInterceptor', function ($rootScope, $q, AUTH_EVENTS) {

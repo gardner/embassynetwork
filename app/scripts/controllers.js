@@ -22,21 +22,24 @@ angular.module('EmbassyNetwork.controllers', [])
 
   $scope.login = function (credentials) {
     console.log(credentials);
-    AuthService.login(credentials).then(function (user) {
+    AuthService.login(credentials).success(function(user) {
+      console.log('success', user);
       $rootScope.$broadcast(AUTH_EVENTS.loginSuccess);
-      $scope.setCurrentUser(user);
-    }, function () {
+    })
+    .error(function(data, status, headers, config) {
+      console.log('fail', data, status, headers, config);
       $rootScope.$broadcast(AUTH_EVENTS.loginFailed);
     });
   };
 })
 
-.controller('TodayCtrl', function($scope) {
-  console.log('TodayCtrl');
+.controller('TodayCtrl', function($scope, Today) {
+  console.log('TodayCtrl', Today.getList());
 })
 
 .controller('MessagesCtrl', function($scope, Messages) {
-  $scope.messages = Messages.all();
+//  console.log('Messages: ', Messages);
+  $scope.messages = Messages.getList();
 })
 
 .controller('MessageDetailCtrl', function($scope, $stateParams, Messages) {
@@ -44,5 +47,5 @@ angular.module('EmbassyNetwork.controllers', [])
 })
 
 .controller('AccountCtrl', function($scope) {
-  console.log('AccountCtrl');
+//  console.log('AccountCtrl');
 });

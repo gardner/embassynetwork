@@ -36,11 +36,19 @@ angular.module('EmbassyNetwork', [
     template: '<div ng-if="visible" ng-include="\'templates/login.html\'">',
     link: function (scope) {
       var showDialog = function () {
+        console.log('showDialog');
         scope.visible = true;
+      };
+      var hideDialog = function () {
+        console.log('hideDialog');
+        scope.visible = false;
       };
       scope.visible = false;
       scope.$on(AUTH_EVENTS.notAuthenticated, showDialog);
       scope.$on(AUTH_EVENTS.sessionTimeout, showDialog);
+      scope.$on(AUTH_EVENTS.notAuthorized, showDialog);
+      scope.$on(AUTH_EVENTS.sessionTimeout, showDialog);
+      scope.$on(AUTH_EVENTS.loginSuccess, hideDialog);
     }
   };
 })
@@ -56,19 +64,6 @@ angular.module('EmbassyNetwork', [
       // org.apache.cordova.statusbar required
       StatusBar.styleDefault();
     }
-    $rootScope.$on('$stateChangeStart', function (event, next) {
-      var authorizedRoles = next.data.authorizedRoles;
-      if (!AuthService.isAuthorized(authorizedRoles)) {
-        event.preventDefault();
-        if (AuthService.isAuthenticated()) {
-          // user is not allowed
-          $rootScope.$broadcast(AUTH_EVENTS.notAuthorized);
-        } else {
-          // user is not logged in
-          $rootScope.$broadcast(AUTH_EVENTS.notAuthenticated);
-        }
-      }
-    });
   });
 })
 
@@ -76,14 +71,6 @@ angular.module('EmbassyNetwork', [
   RestangularProvider.setBaseUrl(ENV.apiEndpoint);
   console.log('baseUrl:', ENV.apiEndpoint);
 
-  RestangularProvider.addElementTransformer('users', true, function(user) {
-          // This will add a method called login that will do a POST to the path login
-          // signature is (name, operation, path, params, headers, elementToPost)
-
-          user.addRestangularMethod('login', 'post', 'login');
-
-          return user;
-  });
   RestangularProvider.addResponseInterceptor(function(data, operation, what, url, response, deferred) {
     if (operation === "getList") {
         response = data.objects;
@@ -93,7 +80,29 @@ angular.module('EmbassyNetwork', [
         response = data.data;
     }
     return response;
-  })
+  });
+  
+  var refreshAccesstoken = function() {
+      var deferred = $q.defer();
+
+      // Refresh access-token logic
+
+      return deferred.promise;
+  };
+
+  RestangularProvider.setErrorInterceptor(function(response, deferred, responseHandler) {
+    if(response.status === 403) {
+      refreshAccesstoken().then(function() {
+        // Repeat the request and then call the handlers the usual way.
+        $http(response.config).then(responseHandler, deferred.reject);
+        // Be aware that no request interceptors are called this way.
+      });
+
+      return false; // error handled
+    }
+
+    return true; // error not handled
+  });  
   
   // Ionic uses AngularUI Router which uses the concept of states
   // Learn more here: https://github.com/angular-ui/ui-router
@@ -157,13 +166,6 @@ angular.module('EmbassyNetwork', [
 
   // if none of the above states are matched, use this as the fallback
   $urlRouterProvider.otherwise('/tab/today');
-
-  $httpProvider.interceptors.push([
-    '$injector',
-    function ($injector) {
-      return $injector.get('AuthInterceptor');
-    }
-  ]);
 
 });
 
