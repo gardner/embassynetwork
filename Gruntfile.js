@@ -336,7 +336,7 @@ module.exports = function (grunt) {
           'test/mock/**/*.js',
           'test/spec/**/*.js'
         ],
-        logLevel: 'DEBUG',
+        logLevel: 'INFO',
         autoWatch: false,
         reporters: ['dots', 'coverage'],
         port: 8080,

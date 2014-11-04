@@ -4,14 +4,14 @@ angular.module('EmbassyNetwork.services', [])
 // kiped from:
 // https://medium.com/opinionated-angularjs/techniques-for-authentication-in-angularjs-applications-7bbf0346acec by gardner
 
-.factory('AuthService', function ($http, Session) {
+.factory('AuthService', function ($http, Session, ENV) {
   var authService = {};
+  var apiEndpoint = ENV.apiEndpoint;
  
   authService.login = function (credentials) {
-    console.log('credentials:', credentials);
     localStorage.setItem('credentials', credentials);
     return $http
-      .post('/login', credentials)
+      .post(apiEndpoint + '/auth/user/', credentials)
       .then(function (res) {
         console.log(res);
         Session.create(res.data.id, res.data.user.id,
@@ -55,16 +55,6 @@ angular.module('EmbassyNetwork.services', [])
 
 .factory('AuthInterceptor', function ($rootScope, $q, AUTH_EVENTS) {
   return {
-    request: function (config) {
-
-      // use this to destroying other existing headers
-      config.headers = {'Authentication':'authentication'}
-
-      // use this to prevent destroying other existing headers
-      // config.headers['Authorization'] = 'authentication;
-
-      return config;
-    },    
     responseError: function (response) {
       console.log('response.status:', response.status);
       $rootScope.$broadcast({
@@ -78,29 +68,16 @@ angular.module('EmbassyNetwork.services', [])
   };
 })
 
-/**
- * A simple example service that returns some data.
- */
-.factory('Messages', function() {
-  // Might use a resource here that returns a JSON array
+.factory('Users', function(Restangular) {
+  return Restangular.service('users');
+})
 
-  // Some fake testing data
-  var messages = [
-    { id: 0, name: 'Scruff McGruff' },
-    { id: 1, name: 'G.I. Joe' },
-    { id: 2, name: 'Miss Frizzle' },
-    { id: 3, name: 'Ash Ketchum' }
-  ];
+.factory('Messages', function(Restangular) {
+  return Restangular.service('messages');
+})
 
-  return {
-    all: function() {
-      return messages;
-    },
-    get: function(messageId) {
-      // Simple index lookup
-      return messages[messageId];
-    }
-  };
+.factory('Today', function(Restangular) {
+  return Restangular.service('today');
 })
 
 .factory('Locations', function(Restangular) {

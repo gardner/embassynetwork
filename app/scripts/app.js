@@ -73,7 +73,9 @@ angular.module('EmbassyNetwork', [
 })
 
 .config(function($stateProvider, $urlRouterProvider, $httpProvider, USER_ROLES, RestangularProvider, ENV) {
-  RestangularProvider.setBaseUrl(ENV.apiEndpoint + '/api/v1');
+  RestangularProvider.setBaseUrl(ENV.apiEndpoint);
+  console.log('baseUrl:', ENV.apiEndpoint);
+
   RestangularProvider.addElementTransformer('users', true, function(user) {
           // This will add a method called login that will do a POST to the path login
           // signature is (name, operation, path, params, headers, elementToPost)
@@ -82,6 +84,16 @@ angular.module('EmbassyNetwork', [
 
           return user;
   });
+  RestangularProvider.addResponseInterceptor(function(data, operation, what, url, response, deferred) {
+    if (operation === "getList") {
+        response = data.objects;
+        response.metadata = data.meta;
+    } else {
+        console.log('data', data);
+        response = data.data;
+    }
+    return response;
+  })
   
   // Ionic uses AngularUI Router which uses the concept of states
   // Learn more here: https://github.com/angular-ui/ui-router

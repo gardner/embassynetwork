@@ -6,13 +6,6 @@ angular.module('EmbassyNetwork.controllers', [])
   $scope.userRoles = USER_ROLES;
   $scope.isAuthorized = AuthService.isAuthorized;
   $scope.isLoginPage = false;
-  $scope.getOpacity = function() {
-    if (!$scope.isAuthorized) {
-      return 0.7;
-    } else {
-      return 1;
-    }
-  }
  
   $scope.setCurrentUser = function (user) {
     $scope.currentUser = user;
@@ -21,11 +14,12 @@ angular.module('EmbassyNetwork.controllers', [])
 })
 
 .controller('LoginCtrl', function ($scope, $rootScope, AUTH_EVENTS, AuthService) {
-  $scope.credentials = {
+  $scope.credentials = localStorage.getItem('credentials') || {
     username: '',
     password: ''
   };
-//  $scope.isLoginPage = true;
+  console.log('loaded credentials: ', $scope.credentials.username, $scope.credentials.password);
+
   $scope.login = function (credentials) {
     console.log(credentials);
     AuthService.login(credentials).then(function (user) {
