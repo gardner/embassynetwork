@@ -1,18 +1,5 @@
 'use strict';
 
-describe('Service: AuthService', function () {
-  var AuthService,
-    httpBackend;
-
-  // load the controller's module
-  beforeEach(module('EmbassyNetwork'));
-
-  beforeEach(inject(function (_AuthService_, $httpBackend) {
-    AuthService = _AuthService_;
-    httpBackend = $httpBackend;
-  }));
-});
-
 describe('Service: Locations', function () {
   var Locations,
     httpBackend,
@@ -40,7 +27,7 @@ describe('Service: Locations', function () {
       });
       done();
     }, function(response) {
-      console.log("Error with status code", response.status);
+      console.log("Error with status code");
     });
     httpBackend.flush();
     rootScope.$apply();

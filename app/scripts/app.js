@@ -9,51 +9,14 @@
 angular.module('EmbassyNetwork', [
   'ionic',
   'config',
+  'ngCookies',
   'EmbassyNetwork.controllers',
   'EmbassyNetwork.services',
-  'restangular'
+  'restangular',
+  'http-auth-interceptor'
 ])
 
-.constant('AUTH_EVENTS', {
-  loginSuccess: 'auth-login-success',
-  loginFailed: 'auth-login-failed',
-  logoutSuccess: 'auth-logout-success',
-  sessionTimeout: 'auth-session-timeout',
-  notAuthenticated: 'auth-not-authenticated',
-  notAuthorized: 'auth-not-authorized'
-})
-
-.constant('USER_ROLES', {
-  all: '*',
-  admin: 'admin',
-  user: 'user',
-  guest: 'guest'
-})
-
-.directive('loginDialog', function (AUTH_EVENTS) {
-  return {
-    restrict: 'A',
-    template: '<div ng-if="visible" ng-include="\'templates/login.html\'">',
-    link: function (scope) {
-      var showDialog = function () {
-        console.log('showDialog');
-        scope.visible = true;
-      };
-      var hideDialog = function () {
-        console.log('hideDialog');
-        scope.visible = false;
-      };
-      scope.visible = false;
-      scope.$on(AUTH_EVENTS.notAuthenticated, showDialog);
-      scope.$on(AUTH_EVENTS.sessionTimeout, showDialog);
-      scope.$on(AUTH_EVENTS.notAuthorized, showDialog);
-      scope.$on(AUTH_EVENTS.sessionTimeout, showDialog);
-      scope.$on(AUTH_EVENTS.loginSuccess, hideDialog);
-    }
-  };
-})
-
-.run(function($ionicPlatform, $rootScope, AUTH_EVENTS, AuthService) {
+.run(function($ionicPlatform, $http, $cookies) {
   $ionicPlatform.ready(function() {
     // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
     // for form inputs)
@@ -64,64 +27,36 @@ angular.module('EmbassyNetwork', [
       // org.apache.cordova.statusbar required
       StatusBar.styleDefault();
     }
+    $http.defaults.headers.common['Authorization'] = 'ApiKey ' + $cookies.username + ':' + $cookies.key;
+    
   });
 })
 
-.config(function($stateProvider, $urlRouterProvider, $httpProvider, USER_ROLES, RestangularProvider, ENV) {
+.config(function($stateProvider, $urlRouterProvider, $httpProvider, RestangularProvider, ENV) {
   RestangularProvider.setBaseUrl(ENV.apiEndpoint);
   console.log('baseUrl:', ENV.apiEndpoint);
 
-  RestangularProvider.addResponseInterceptor(function(data, operation, what, url, response, deferred) {
-    if (operation === "getList") {
-        response = data.objects;
-        response.metadata = data.meta;
+  RestangularProvider.addResponseInterceptor(function(data, operation, what, url, response) {
+    if (operation === 'getList') {
+      response = data.objects;
+      response.metadata = data.meta;
     } else {
-        console.log('data', data);
-        response = data.data;
+      console.log('data', data);
+      response = data.data;
     }
     return response;
   });
-  
-  var refreshAccesstoken = function() {
-      var deferred = $q.defer();
-
-      // Refresh access-token logic
-
-      return deferred.promise;
-  };
-
-  RestangularProvider.setErrorInterceptor(function(response, deferred, responseHandler) {
-    if(response.status === 403) {
-      refreshAccesstoken().then(function() {
-        // Repeat the request and then call the handlers the usual way.
-        $http(response.config).then(responseHandler, deferred.reject);
-        // Be aware that no request interceptors are called this way.
-      });
-
-      return false; // error handled
-    }
-
-    return true; // error not handled
-  });  
   
   // Ionic uses AngularUI Router which uses the concept of states
   // Learn more here: https://github.com/angular-ui/ui-router
   // Set up the various states which the app can be in.
   // Each state's controller can be found in controllers.js
   $stateProvider
-    .state('login', {
-      url: '/login',
-      templateUrl: 'templates/login.html',
-      controller: 'SignInCtrl'
-    })
     // setup an abstract state for the tabs directive
     .state('tab', {
       url: '/tab',
       abstract: true,
-      templateUrl: 'templates/tabs.html',
-      data: {
-        authorizedRoles: [USER_ROLES.user, USER_ROLES.admin]
-      }
+      templateUrl: 'templates/tabs.html'
     })
     
     // Each tab has its own nav history stack:
@@ -166,6 +101,6 @@ angular.module('EmbassyNetwork', [
 
   // if none of the above states are matched, use this as the fallback
   $urlRouterProvider.otherwise('/tab/today');
-
+  console.log('done loading app');
 });
 
