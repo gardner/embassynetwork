@@ -323,6 +323,7 @@ module.exports = function (grunt) {
         frameworks: ['jasmine-jquery', 'jasmine'],
         files: [
           '<%= yeoman.app %>/lib/angular/angular.js',
+          '<%= yeoman.app %>/lib/angular-cookies/angular-cookies.js',
           '<%= yeoman.app %>/lib/angular-animate/angular-animate.js',
           '<%= yeoman.app %>/lib/angular-sanitize/angular-sanitize.js',
           '<%= yeoman.app %>/lib/angular-ui-router/release/angular-ui-router.js',
@@ -331,6 +332,7 @@ module.exports = function (grunt) {
           '<%= yeoman.app %>/lib/angular-mocks/angular-mocks.js',
           '<%= yeoman.app %>/lib/lodash/dist/lodash.js',
           '<%= yeoman.app %>/lib/restangular/dist/restangular.js',
+          '<%= yeoman.app %>/lib/mdo-http-auth-interceptor/http-auth-interceptor.js',
           '<%= yeoman.app %>/<%= yeoman.scripts %>/**/*.js',
           {pattern: 'test/fixtures/*.json', served: true, included: false, watched: false},
           'test/mock/**/*.js',
