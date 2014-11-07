@@ -2,7 +2,7 @@
 angular.module('EmbassyNetwork.services', [])
 
 .factory('Users', function(Restangular) {
-  return Restangular.service('users');
+  return Restangular.service('users/');
 })
 // $scope.accounts = Restangular.all('accounts').getList().$object;
 .factory('Messages', function(Restangular) {
@@ -10,9 +10,9 @@ angular.module('EmbassyNetwork.services', [])
 })
 
 .factory('Today', function(Restangular) {
-  return Restangular.service('today');
+  return Restangular.service('today/');
 })
 
 .factory('Locations', function(Restangular) {
-  return Restangular.service('locations');
+  return Restangular.service('locations/');
 });

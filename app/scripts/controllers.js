@@ -1,12 +1,7 @@
 'use strict';
 angular.module('EmbassyNetwork.controllers', ['ngCookies'])
 
-.controller('AppCtrl', function($scope, ENV, $ionicModal, $cookies, $state) {
-  $scope.user = {
-    location_id: $cookies.location_id,
-    username: $cookies.username,
-    password: $cookies.password
-  };
+.controller('AppCtrl', function($scope, ENV, $ionicModal, $state) {
   $scope.apiEndpoint = ENV.apiEndpoint;
   
   $scope.goto = function(stateName) {
@@ -31,14 +26,19 @@ angular.module('EmbassyNetwork.controllers', ['ngCookies'])
 
 })
 
-.controller('LoginCtrl', function ($scope, $http, authService) {
+.controller('LoginCtrl', function ($scope, $http, $cookies, authService) {
   console.log('create login controller');
+  $scope.user = {
+    location_id: $cookies.location_id,
+    username: $cookies.username,
+    password: $cookies.password
+  };
 
   $scope.submit = function() {
-    console.log($scope.user);
+    console.log('user', $scope.user);
     $http.post(
       $scope.apiEndpoint + '/users/login/',
-      JSON.stringify({ username: $scope.user.username, password: $scope.user.username.password })
+      JSON.stringify({ username: $scope.user.username, password: $scope.user.password })
     ).success(
       function(data) {
         console.log('LoginController submit success');
@@ -58,7 +58,6 @@ angular.module('EmbassyNetwork.controllers', ['ngCookies'])
   };
   
   $scope.$on('event:auth-loginRequired', function(e, rejection) {
-    console.log('login confirmed');
     console.log('login required');
     $scope.loginModal.show();
   });
@@ -95,7 +94,7 @@ angular.module('EmbassyNetwork.controllers', ['ngCookies'])
   }
 })
 
-.controller('MessageComposeCtrl', function($scope, $stateParams, Messages, Users) {
+.controller('MessageComposeCtrl', function($scope, $stateParams, Messages, Users, $state) {
   $scope.data = {
     users: []
   }
@@ -106,12 +105,13 @@ angular.module('EmbassyNetwork.controllers', ['ngCookies'])
   }
   $scope.possibleRecipients = [];
   
-  // get all users
+  // get all users from a tastypie endpoint
   Users.getList({limit: 0, order_by:'-last_login'}).then(function(users) {
     $scope.data.users = users;
     console.log('Got', $scope.data.users.length, 'users.');
   });
 
+  // the ng-click action of the list-items
   $scope.selectRecipient = function(recipient) {
     console.log('recipient', recipient);
     $scope.message.to = recipient;
@@ -119,19 +119,33 @@ angular.module('EmbassyNetwork.controllers', ['ngCookies'])
     $scope.possibleRecipients = [];
   };
   
+  // filter the list of recipients
   $scope.autocomplete = function() {
     if ($scope.message.recipient.length < 3) return;
     $scope.possibleRecipients = $scope.data.users.filter(function(r) {
     	if(r.username.toLowerCase().indexOf($scope.message.recipient.toLowerCase()) !== -1 ) return true;
     })
   };
+  
+  $scope.resetAutoComplete = function() {
+    $scope.possibleRecipients = [];
+  };
 
+  // post the message and reset the values
   $scope.sendMessage = function(message) {
     $scope.message.recipient = $scope.message.to.resource_uri;
     delete $scope.message.to;
     $scope.possibleRecipients = [];
     console.log('Sending', $scope.message);
-    Messages.post($scope.message);
+    // reset message form
+    Messages.post($scope.message).then(function() {
+      $scope.message = {
+        recipient: '',
+        subject: '',
+        body: ''
+      };
+      $state.go('/messages');
+    });
   };
 })
 

@@ -78,8 +78,8 @@ angular.module('EmbassyNetwork', [
         }
       }
     })
-    .state('tab.message.detail', {
-      url: '/:messageId',
+    .state('tab.message/detail', {
+      url: '/message/:messageId',
       views: {
         'tab-messages': {
           templateUrl: 'templates/message-detail.html',
@@ -87,8 +87,8 @@ angular.module('EmbassyNetwork', [
         }
       }
     })
-    .state('tab.message-compose', {
-      url: '/message/new',
+    .state('tab.message.compose', {
+      url: '/new',
       views: {
         'tab-messages': {
           templateUrl: 'templates/message-compose.html',
