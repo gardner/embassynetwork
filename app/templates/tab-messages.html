@@ -1,9 +1,13 @@
 <ion-view title="Messages">
   <ion-header-bar align-title="left" class="bar-positive bar-subheader">
-    <button class="button icon-left ion-plus">New</button>
+    <button class="button icon-left ion-plus" ui-sref="tab.message-compose">New</button>
   </ion-header-bar>
   <ion-content class="has-header">
     <ion-list>
+      <ion-item ng-show="!messages.length" class="item-icon-right" type="item-text-wrap" ui-sref="tab.message-compose">
+        No messages
+      </ion-item>
+      
       <ion-item class="item-icon-right" ng-repeat="message in messages" type="item-text-wrap" href="#/tab/message/{{message.id}}">
         {{message.name}}
         <i class="icon ion-chevron-right icon-accessory"></i>

@@ -1,13 +1,17 @@
 'use strict';
 angular.module('EmbassyNetwork.controllers', ['ngCookies'])
 
-.controller('AppCtrl', function($scope, ENV, $ionicModal, $cookies) {
+.controller('AppCtrl', function($scope, ENV, $ionicModal, $cookies, $state) {
   $scope.user = {
     location_id: $cookies.location_id,
     username: $cookies.username,
     password: $cookies.password
   };
   $scope.apiEndpoint = ENV.apiEndpoint;
+  
+  $scope.goto = function(stateName) {
+    $state.go(stateName);
+  };
   
   $ionicModal.fromTemplateUrl('templates/login.html', function(modal) {
       console.log('create modal');
@@ -33,7 +37,7 @@ angular.module('EmbassyNetwork.controllers', ['ngCookies'])
   $scope.submit = function() {
     console.log($scope.user);
     $http.post(
-      $scope.apiEndpoint + '/user/login/',
+      $scope.apiEndpoint + '/users/login/',
       JSON.stringify({ username: $scope.user.username, password: $scope.user.username.password })
     ).success(
       function(data) {
@@ -84,7 +88,51 @@ angular.module('EmbassyNetwork.controllers', ['ngCookies'])
 })
 
 .controller('MessageDetailCtrl', function($scope, $stateParams, Messages) {
-  $scope.message = Messages.get($stateParams.messageId);
+  if ($stateParams.messageId) {
+    $scope.message = Messages.get($stateParams.messageId);
+  } else {
+    $scope.message = {};
+  }
+})
+
+.controller('MessageComposeCtrl', function($scope, $stateParams, Messages, Users) {
+  $scope.data = {
+    users: []
+  }
+  $scope.message = {
+    recipient: '',
+    subject: '',
+    body: ''
+  }
+  $scope.possibleRecipients = [];
+  
+  // get all users
+  Users.getList({limit: 0, order_by:'-last_login'}).then(function(users) {
+    $scope.data.users = users;
+    console.log('Got', $scope.data.users.length, 'users.');
+  });
+
+  $scope.selectRecipient = function(recipient) {
+    console.log('recipient', recipient);
+    $scope.message.to = recipient;
+    $scope.message.recipient = recipient.username;
+    $scope.possibleRecipients = [];
+  };
+  
+  $scope.autocomplete = function() {
+    if ($scope.message.recipient.length < 3) return;
+    $scope.possibleRecipients = $scope.data.users.filter(function(r) {
+    	if(r.username.toLowerCase().indexOf($scope.message.recipient.toLowerCase()) !== -1 ) return true;
+    })
+  };
+
+  $scope.sendMessage = function(message) {
+    $scope.message.recipient = $scope.message.to.resource_uri;
+    delete $scope.message.to;
+    $scope.possibleRecipients = [];
+    console.log('Sending', $scope.message);
+    Messages.post($scope.message);
+  };
 })
 
 .controller('AccountCtrl', function($scope, Locations, $location) {

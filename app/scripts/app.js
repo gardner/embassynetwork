@@ -41,7 +41,6 @@ angular.module('EmbassyNetwork', [
       response = data.objects;
       response.metadata = data.meta;
     } else {
-      console.log('data', data);
       response = data.data;
     }
     return response;
@@ -79,12 +78,21 @@ angular.module('EmbassyNetwork', [
         }
       }
     })
-    .state('tab.message-detail', {
-      url: '/message/:messageId',
+    .state('tab.message.detail', {
+      url: '/:messageId',
       views: {
         'tab-messages': {
           templateUrl: 'templates/message-detail.html',
           controller: 'MessageDetailCtrl'
+        }
+      }
+    })
+    .state('tab.message-compose', {
+      url: '/message/new',
+      views: {
+        'tab-messages': {
+          templateUrl: 'templates/message-compose.html',
+          controller: 'MessageComposeCtrl'
         }
       }
     })
