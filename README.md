@@ -12,6 +12,7 @@ The ambassynetwork code is licensed under the Affero General Public License, whi
     npm install -g bower
     npm install && bower install
     grunt serve
+    /Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome --disable-web-security http://localhost:8100/
 
 ## Build for Devices
 The build system is based around cordova. The code can be built for multiple platforms. An osx machine with Xcode installed is required to build for iOS.
