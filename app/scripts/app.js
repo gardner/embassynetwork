@@ -9,14 +9,13 @@
 angular.module('EmbassyNetwork', [
   'ionic',
   'config',
-  'ngCookies',
   'EmbassyNetwork.controllers',
   'EmbassyNetwork.services',
   'restangular',
   'http-auth-interceptor'
 ])
 
-.run(function($ionicPlatform, $http, $cookies) {
+.run(function($ionicPlatform, $http, $localStorage) {
   $ionicPlatform.ready(function() {
     // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
     // for form inputs)
@@ -27,7 +26,7 @@ angular.module('EmbassyNetwork', [
       // org.apache.cordova.statusbar required
       StatusBar.styleDefault();
     }
-    $http.defaults.headers.common['Authorization'] = 'ApiKey ' + $cookies.username + ':' + $cookies.key;
+    $http.defaults.headers.common['Authorization'] = $localStorage.get('Authorization');
     
   });
 })
@@ -68,7 +67,6 @@ angular.module('EmbassyNetwork', [
         }
       }
     })
-
     .state('tab.messages', {
       url: '/messages',
       views: {
@@ -78,7 +76,7 @@ angular.module('EmbassyNetwork', [
         }
       }
     })
-    .state('tab.message/detail', {
+    .state('tab.message-detail', {
       url: '/message/:messageId',
       views: {
         'tab-messages': {
@@ -87,8 +85,8 @@ angular.module('EmbassyNetwork', [
         }
       }
     })
-    .state('tab.message.compose', {
-      url: '/new',
+    .state('tab.message-compose', {
+      url: '/message/new',
       views: {
         'tab-messages': {
           templateUrl: 'templates/message-compose.html',

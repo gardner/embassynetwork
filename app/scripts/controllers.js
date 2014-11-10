@@ -26,12 +26,11 @@ angular.module('EmbassyNetwork.controllers', ['ngCookies'])
 
 })
 
-.controller('LoginCtrl', function ($scope, $http, $cookies, authService) {
+.controller('LoginCtrl', function ($scope, $http, $localStorage, authService) {
   console.log('create login controller');
   $scope.user = {
-    location_id: $cookies.location_id,
-    username: $cookies.username,
-    password: $cookies.password
+    username: $localStorage.get('username'),
+    password: $localStorage.get('password')
   };
 
   $scope.submit = function() {
@@ -42,23 +41,23 @@ angular.module('EmbassyNetwork.controllers', ['ngCookies'])
     ).success(
       function(data) {
         console.log('LoginController submit success');
-        //debugger;
-        $cookies.username = data.username;
-        $cookies.key = data.key;
         $http.defaults.headers.common['Authorization'] = 'ApiKey ' + data.username + ':' + data.key;
-        authService.loginConfirmed();
+        $localStorage.set('Authorization', $http.defaults.headers.common['Authorization']);
+        authService.loginConfirmed({}, function(config) {
+          config['headers']['Authorization'] = 'ApiKey ' + data.username + ':' + data.key;
+        });
       }
     ).error(
       function(data) {
         console.log('LoginController submit error');
         $scope.errorMsg = data.reason;
-        //debugger;
       }
     );
   };
   
   $scope.$on('event:auth-loginRequired', function(e, rejection) {
     console.log('login required');
+    $localStorage.set('Authorization', '');
     $scope.loginModal.show();
   });
   
@@ -75,7 +74,10 @@ angular.module('EmbassyNetwork.controllers', ['ngCookies'])
   
 })
 
-.controller('TodayCtrl', function($scope, Today) {
+.controller('TodayCtrl', function($scope, Today, $state, $localStorage) {
+  if (!$localStorage.get('location_id')) {
+    $state.go('tab.account');
+  }
   console.log('TodayCtrl');
 })
 
@@ -144,21 +146,22 @@ angular.module('EmbassyNetwork.controllers', ['ngCookies'])
         subject: '',
         body: ''
       };
-      $state.go('/messages');
+      $state.go('tab.messages');
     });
   };
 })
 
-.controller('AccountCtrl', function($scope, Locations, $location) {
+.controller('AccountCtrl', function($scope, Locations, $state, $localStorage) {
+  $scope.user = {
+    location_id: $localStorage.get('location_id')
+  }
   Locations.getList().then(function(locations) {
     $scope.locations = locations;
     console.log('Locations: ', $scope.locations);
   });
   $scope.setLocation = function() {
-    console.log($scope.user);
     // the user selected a location
-    $location.path('/today');
+    $localStorage.set('location_id', $scope.user.location_id);
+    $state.go('tab.today');
   };
-  
-  console.log('AccountCtrl', $scope.message);
 });
