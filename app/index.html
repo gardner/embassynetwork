@@ -17,7 +17,7 @@
     <!-- endbuild -->
   </head>
 
-  <body ng-app="EmbassyNetwork" animation="slide-left-right-ios7">
+  <body ng-app="EmbassyNetwork" ng-controller="AppCtrl" animation="slide-left-right-ios7">
     <!--
       The nav bar that will be updated as we navigate between views.
     -->
@@ -43,12 +43,14 @@
     <script src="lib/collide/collide.js"></script>
     <script src="lib/ionic/release/js/ionic.js"></script>
     <script src="lib/ionic/release/js/ionic-angular.js"></script>
+    <script src="lib/lodash/dist/lodash.compat.js"></script>
+    <script src="lib/restangular/dist/restangular.js"></script>
+    <script src="lib/angular-cookies/angular-cookies.js"></script>
     <!-- endbower -->
     <!-- endbuild -->
 
     <!-- cordova script (this will be a 404 during development) -->
     <script src="cordova.js"></script>
-
 
         <!-- build:js scripts/scripts.js -->
         <script src="scripts/config.js"></script>
@@ -56,6 +58,8 @@
         <script src="scripts/controllers.js"></script>
         <script src="scripts/services.js"></script>
         <!-- endbuild -->
-    <div login-dialog ng-if="!isLoginPage"></div>
+
+    <script src="lib/mdo-http-auth-interceptor/http-auth-interceptor.js"></script>
+
 </body>
 </html>

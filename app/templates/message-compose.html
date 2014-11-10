@@ -1,0 +1,25 @@
+<ion-view title="New Message">
+  <ion-content has-header="true" padding="true">
+    <form ng-submit="sendMessage(message)">
+      <ion-list>
+        <ion-item class="item-input">
+          <input type="text" placeholder="To" ng-change="autocomplete()" ng-blur="resetAutoComplete()" ng-model="message.recipient">
+        </ion-item>
+        <ion-list>
+          <ion-item class="icon ion-person-add" ng-click="selectRecipient(recipient)" ng-repeat="recipient in possibleRecipients">
+            {{recipient.username}}
+          <ion-item>
+        </ion-list>
+        <ion-item class="item-input">
+          <input type="text" id="subject" placeholder="Subject" ng-model="message.subject">
+        </ion-item>
+        <ion-item class="item-input">
+          <textarea placeholder="Body" ng-model="message.body"></textarea>
+        </ion-item>
+        <ion-item class="item-input">
+          <button type="submit" class="button">Send</button>
+        </ion-item>
+      </ion-list>
+    </form>
+  </ion-content>
+</ion-view>

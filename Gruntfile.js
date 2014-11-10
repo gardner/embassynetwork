@@ -41,7 +41,7 @@ module.exports = function (grunt) {
         constants: {
           ENV: {
             name: 'development',
-            apiEndpoint: 'http://dev.yoursite.com:10000/'
+            apiEndpoint: 'http://localhost:8989/api/v1'
           }
         }
       },
@@ -49,7 +49,7 @@ module.exports = function (grunt) {
         constants: {
           ENV: {
             name: 'production',
-            apiEndpoint: 'http://api.yoursite.com/'
+            apiEndpoint: 'https://embassynetwork.com/api/v1'
           }
         }
       }
@@ -320,19 +320,25 @@ module.exports = function (grunt) {
     karma: {
       options: {
         basePath: '',
-        frameworks: ['mocha', 'chai'],
+        frameworks: ['jasmine-jquery', 'jasmine'],
         files: [
           '<%= yeoman.app %>/lib/angular/angular.js',
+          '<%= yeoman.app %>/lib/angular-cookies/angular-cookies.js',
           '<%= yeoman.app %>/lib/angular-animate/angular-animate.js',
           '<%= yeoman.app %>/lib/angular-sanitize/angular-sanitize.js',
           '<%= yeoman.app %>/lib/angular-ui-router/release/angular-ui-router.js',
           '<%= yeoman.app %>/lib/ionic/release/js/ionic.js',
           '<%= yeoman.app %>/lib/ionic/release/js/ionic-angular.js',
           '<%= yeoman.app %>/lib/angular-mocks/angular-mocks.js',
+          '<%= yeoman.app %>/lib/lodash/dist/lodash.js',
+          '<%= yeoman.app %>/lib/restangular/dist/restangular.js',
+          '<%= yeoman.app %>/lib/mdo-http-auth-interceptor/http-auth-interceptor.js',
           '<%= yeoman.app %>/<%= yeoman.scripts %>/**/*.js',
+          {pattern: 'test/fixtures/*.json', served: true, included: false, watched: false},
           'test/mock/**/*.js',
           'test/spec/**/*.js'
         ],
+        logLevel: 'INFO',
         autoWatch: false,
         reporters: ['dots', 'coverage'],
         port: 8080,
@@ -435,7 +441,7 @@ module.exports = function (grunt) {
   // we don't have to run the karma test server as part of `grunt serve`
   grunt.registerTask('watch:karma', function () {
     var karma = {
-      files: ['<%= yeoman.app %>/<%= yeoman.scripts %>/**/*.js', 'test/spec/**/*.js'],
+      files: ['<%= yeoman.app %>/<%= yeoman.scripts %>/**/*.js', 'test/spec/**/*.js', 'test/fixtures/*.js'],
       tasks: ['newer:jshint:test', 'karma:unit:run']
     };
     grunt.config.set('watch', karma);

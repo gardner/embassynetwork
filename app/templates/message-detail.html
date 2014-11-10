@@ -4,7 +4,9 @@
   The MessagesCtrl pulls data from the Messages service (service.js)
   The Messages service returns an array of message data
 -->
-<ion-view title="{{message.name}}">
+<ion-view title="{{message.subject}}">
   <ion-content has-header="true" padding="true">
+  {{message.subject}}
+  {{message.body}}
   </ion-content>
 </ion-view>
